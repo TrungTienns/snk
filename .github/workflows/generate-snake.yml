@@ -2,20 +2,24 @@ name: Generate GitHub Snake Animation
 
 on:
   schedule:
-    - cron: "0 0 * * *"   # Chạy mỗi ngày lúc 0:00 UTC
-  workflow_dispatch:      # Cho phép trigger thủ công
+    - cron: "0 0 * * *"    # Chạy mỗi ngày lúc 0:00 UTC
+  workflow_dispatch:       # Cho phép trigger thủ công
   push:
     branches:
-      - main             # Chạy khi push vào main
+      - main              # Chạy khi push vào main
 
 jobs:
   generate:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    environment: github-pages  # ← bắt buộc để deploy không lỗi
 
     steps:
-      - uses: actions/checkout@v3
+      # Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
+      # Tạo Snake animation
       - name: Generate Snake Animation
         uses: Platane/snk/svg-only@v3
         with:
@@ -26,6 +30,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Deploy lên branch output
       - name: Deploy Output
         uses: peaceiris/actions-gh-pages@v3
         with:
@@ -33,4 +38,3 @@ jobs:
           publish_dir: ./dist
           publish_branch: output
           commit_message: "Update snake animation [skip ci]"
-        environment: github-pages
